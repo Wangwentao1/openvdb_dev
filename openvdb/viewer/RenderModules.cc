@@ -32,7 +32,6 @@
 #include <openvdb/util/logging.h>
 #include <math.h>
 
-
 namespace openvdb_viewer {
 
 // BufferObject
@@ -45,6 +44,8 @@ BufferObject::BufferObject():
     mPrimType(GL_POINTS),
     mPrimNum(0)
 {
+
+
 }
 
 BufferObject::~BufferObject() { clear(); }
@@ -368,8 +369,8 @@ ViewportModule::render()
     glLoadIdentity();
 
 
-    GLfloat campos[3] = { modelview[2], modelview[6], modelview[10] };
-    GLfloat up[3] = { modelview[1], modelview[5], modelview[9] };
+    GLfloat campos[3] = {0.0 + modelview[2], 0.0 + modelview[6], 0.0 + modelview[10]};
+    GLfloat up[3] = {modelview[1], modelview[5], modelview[9]};
 
     gluLookAt(campos[0], campos[1], campos[2], 0.0, 0.0, 0.0, up[0], up[1], up[2]);
 

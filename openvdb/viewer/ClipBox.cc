@@ -30,9 +30,11 @@
 
 #include "ClipBox.h"
 
+#include <stdlib.h>
+#include <cmath>
+
 #include <deque>
 #include <GL/glfw.h>
-
 
 namespace openvdb_viewer {
 

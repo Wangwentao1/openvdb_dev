@@ -38,15 +38,14 @@
 #include <openvdb/tools/PointScatter.h>
 #include <openvdb/tree/LeafManager.h>
 #include <openvdb/math/Operators.h>
-
 #include <boost/random/mersenne_twister.hpp>
-
+#include <stdlib.h>
+#include <math.h>
 #if defined(__APPLE__) || defined(MACOSX)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 #endif
 
 
@@ -209,7 +208,8 @@ public:
     void operator()(typename GridType::ConstPtr grid)
     {
         using openvdb::Index64;
-
+		using openvdb::Coord;
+		using openvdb::v2_0_0::math::CoordBBox;
         Index64 nodeCount = grid->tree().leafCount() + grid->tree().nonLeafCount();
         const Index64 N = nodeCount * 8 * 3;
 
@@ -220,7 +220,7 @@ public:
 
         openvdb::Vec3d ptn;
         openvdb::Vec3s color;
-        openvdb::CoordBBox bbox;
+        CoordBBox bbox;
         Index64 pOffset = 0, iOffset = 0,  cOffset = 0, idx = 0;
 
         for (typename GridType::TreeType::NodeCIter iter = grid->tree().cbeginNode(); iter; ++iter)
@@ -377,9 +377,9 @@ public:
 
     void runParallel()
     {
-        tbb::parallel_for(mLeafs.getRange(), *this);
+		const tbb::blocked_range<openvdb::Index64> range(mLeafs.getRange().begin(), mLeafs.getRange().end(), mLeafs.getRange().grainsize());
+		tbb::parallel_for(range, *this);
     }
-
 
     inline void operator()(const tbb::blocked_range<openvdb::Index64>& range) const
     {
@@ -425,7 +425,7 @@ public:
                 insertPoint(pos, index);
                 ++index;
 
-                int r = int(std::floor(mVoxelsPerLeaf / activeVoxels));
+                int r = int(std::floor((double)(mVoxelsPerLeaf / activeVoxels)));
                 for (int i = 1, I = mVoxelsPerLeaf - 2; i < I; ++i) {
                     pos = mTransform.indexToWorld(coords[i * r]);
                     insertPoint(pos, index);

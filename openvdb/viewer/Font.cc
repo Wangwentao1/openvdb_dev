@@ -30,6 +30,7 @@
 
 #include "Font.h"
 
+#include <stdlib.h>
 #include <openvdb/Types.h> // for OPENVDB_START_THREADSAFE_STATIC_WRITE
 #include <GL/glfw.h>
 

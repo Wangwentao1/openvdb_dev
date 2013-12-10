@@ -32,13 +32,11 @@
 #define OPENVDB_VIEWER_CLIPBOX_HAS_BEEN_INCLUDED
 
 #include <openvdb/Types.h>
-
 #if defined(__APPLE__) || defined(MACOSX)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 #endif
 
 

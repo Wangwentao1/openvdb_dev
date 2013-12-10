@@ -34,24 +34,35 @@
 #include "ClipBox.h"
 #include "Font.h"
 #include "RenderModules.h"
+
+
 #include <openvdb/util/Formats.h> // for formattedInt()
 #include <tbb/mutex.h>
+
+#if defined(__APPLE__) || defined(MACOSX)
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
+
+#include <GL/glew.h>
+#endif
+
+#include <GL/glfw.h>
+
+#include <stdlib.h>
 #include <iomanip> // for std::setprecision()
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <limits>
 
-#if defined(__APPLE__) || defined(MACOSX)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
+#ifdef max
+#define max max
 #endif
 
-#include <GL/glfw.h>
-
+#ifdef min
+#define min min
+#endif
 
 namespace openvdb_viewer {
 
@@ -231,6 +242,8 @@ ViewerImpl::init(const std::string& progName, bool verbose)
     if (glfwInit() != GL_TRUE) {
         OPENVDB_LOG_ERROR("GLFW Initialization Failed.");
     }
+	glewExperimental = true; // Needed for core profile
+
 
     if (verbose) {
         if (glfwOpenWindow(100, 100, 8, 8, 8, 8, 24, 0, GLFW_WINDOW)) {
@@ -240,6 +253,9 @@ ViewerImpl::init(const std::string& progName, bool verbose)
                 << "OpenGL: " << glGetString(GL_VERSION) << std::endl;
             glfwCloseWindow();
         }
+		if (glewInit() != GLEW_OK) {
+		fprintf(stderr, "Failed to initialize GLEW\n");
+	 }
     }
 }
 
@@ -311,7 +327,7 @@ ViewerImpl::view(const openvdb::GridCPtrVec& gridList, int width, int height)
 openvdb::BBoxd
 worldSpaceBBox(const openvdb::math::Transform& xform, const openvdb::CoordBBox& bbox)
 {
-    openvdb::Vec3d pMin = openvdb::Vec3d(std::numeric_limits<double>::max());
+    openvdb::Vec3d pMin = openvdb::Vec3d(1.7976931348623158e+308,1.7976931348623158e+308,1.7976931348623158e+308);
     openvdb::Vec3d pMax = -pMin;
 
     const openvdb::Coord& min = bbox.min();
@@ -413,6 +429,9 @@ ViewerImpl::viewGrids(const openvdb::GridCPtrVec& gridList, int width, int heigh
         glfwTerminate();
         return;
     }
+	if (glewInit() != GLEW_OK) {
+		fprintf(stderr, "Failed to initialize GLEW\n");
+	}
 
     glfwSetWindowTitle(mProgName.c_str());
     glfwSwapBuffers();

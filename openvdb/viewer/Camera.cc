@@ -30,19 +30,16 @@
 
 #include "Camera.h"
 
+#include <stdlib.h>
 #include <cmath>
-
 #if defined(__APPLE__) || defined(MACOSX)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 #endif
 
 #include <GL/glfw.h>
-
-
 namespace openvdb_viewer {
 
 const double Camera::sDeg2rad = M_PI / 180.0;
